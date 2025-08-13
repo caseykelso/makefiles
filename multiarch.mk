@@ -96,8 +96,8 @@ $(error S3.BUCKET must be defined.)
 endif
 	PATH=$(HOME)/.local/bin:$(PATH) $(AWS.BIN) s3 cp $(PACKAGE.DIR)/$(ARTIFACT.NAME).tar.gz s3://$(S3.BUCKET) --acl public-read --no-progress
 	PATH=$(HOME)/.local/bin:$(PATH) $(AWS.BIN) s3 cp $(PACKAGE.DIR)/$(ARTIFACT.NAME).tar.gz.md5 s3://$(S3.BUCKET) --acl public-read --no-progress
-	@echo https://$(S3.BUCKET).s3.amazonaws.com/$(PACKAGE.LINUX.ARCHIVE)
-	@echo https://$(S3.BUCKET).s3.amazonaws.com/$(PACKAGE.LINUX.ARCHIVE).md5
+	@echo https://$(S3.BUCKET).s3.amazonaws.com/$(ARTIFACT.NAME).tar.gz
+	@echo https://$(S3.BUCKET).s3.amazonaws.com/$(ARTIFACT.NAME).tar.gz.md5
 
 
 # Cross-compilation targets (requires appropriate toolchains)
@@ -142,7 +142,7 @@ help:
 	@echo "  info         - Show build information"
 	@echo "  build        - Build the project"
 	@echo "  package      - Create distributable archive"
-	@echo "  upload-github - Upload to GitHub Releases (requires GITHUB_TOKEN)"
+	@echo "  upload       - Upload to s3 bucket"
 	@echo "  build-all    - Cross-compile for all targets"
 	@echo "  package-all  - Package all cross-compiled targets"
 	@echo "  clean        - Remove build artifacts"
