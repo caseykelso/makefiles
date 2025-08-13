@@ -80,7 +80,12 @@ info:
 
 distribute: .FORCE
 	rm -rf $(DIST.DIR) && mkdir -p $(DIST.DIR)
-	cp $(MOTUS.BIN) $(DIST.DIR)/$(PACKAGE.LINUX)
+	mkdir -p $(DIST.DIR)/bin
+	mkdir -p $(DIST.DIR)/lib
+	mkdir -p $(DIST.DIR)/include
+	cp -r $(INSTALLED.HOST.DIR)/bin $(DIST.DIR)/bin
+	cp -r $(INSTALLED.HOST.DIR)/lib $(DIST.DIR)/lib
+	cp -r $(INSTALLED.HOST.DIR)/include $(DIST.DIR)/include
 
 package: .FORCE
 	mkdir -p $(DIST.DIR)
