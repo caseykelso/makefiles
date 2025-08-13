@@ -85,14 +85,15 @@ distribute: .FORCE
 	cp -r $(INSTALLED.HOST.DIR)/include $(DIST.DIR)/include
 
 package: .FORCE
-	tar  czvf $(ARTIFACT.NAME).tar.gz -C $(DIST.DIR) .  && md5sum $(ARTIFACT.NAME).tar.gz > $(ARTIFACT.NAME).tar.gz.md5
+	mkdir -p $(PACKAGE.DIR)
+	cd $(PACKAGE.DIR) && tar czvf $(ARTIFACT.NAME).tar.gz -C $(DIST.DIR) .  && md5sum $(ARTIFACT.NAME).tar.gz > $(ARTIFACT.NAME).tar.gz.md5
 
-upload.linux: .FORCE
+upload: .FORCE
 ifndef S3.BUCKET
 $(error S3.BUCKET must be defined.)
 endif
-	PATH=$(HOME)/.local/bin:$(PATH) $(AWS.BIN) s3 cp $(DIST.DIR)/$(PACKAGE.LINUX.ARCHIVE) s3://$(S3.BUCKET) --acl public-read --no-progress
-	PATH=$(HOME)/.local/bin:$(PATH) $(AWS.BIN) s3 cp $(DIST.DIR)/$(PACKAGE.LINUX.ARCHIVE).md5 s3://$(S3.BUCKET) --acl public-read --no-progress
+	PATH=$(HOME)/.local/bin:$(PATH) $(AWS.BIN) s3 cp $(PACKAGE.DIR)/$(ARTIFACT.NAME).tar.gz s3://$(S3.BUCKET) --acl public-read --no-progress
+	PATH=$(HOME)/.local/bin:$(PATH) $(AWS.BIN) s3 cp $(PACKAGE.DIR)/$(ARTIFACT.NAME).tar.gz.md5 s3://$(S3.BUCKET) --acl public-read --no-progress
 	@echo https://$(S3.BUCKET).s3.amazonaws.com/$(PACKAGE.LINUX.ARCHIVE)
 	@echo https://$(S3.BUCKET).s3.amazonaws.com/$(PACKAGE.LINUX.ARCHIVE).md5
 
