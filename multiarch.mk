@@ -151,3 +151,57 @@ help:
 	@echo "  build-linux-x86_64   build-linux-arm64"
 	@echo "  build-windows-x86_64 build-macos-x86_64 build-macos-arm64"
 
+get_URL: = https://$(S3.BUCKET).s3.amazonaws.com/$($1)-$(call get_version,$($1))-$(OS)-$(ARCH).tar.gz
+
+# Function to get version for a package
+define get_version
+$(word 2,$(subst :, ,$(filter $1:%,$(DEPENDENCIES))))
+endef
+
+# Function to get URL for a package
+define get_url
+$($(1)_URL)
+endef
+
+# Generate targets for each dependency
+define DEPENDENCY_TEMPLATE
+$(DEPS_DIR)/$(1)/.installed: | $(DEPS_DIR)
+	@echo "Installing dependency: $(1) version $(call get_version,$(1))"
+	@mkdir -p $(INSTALLED.HOST.DIR)
+	@cd $(DEPS_DIR)/$(1)/src && \
+		echo "Downloading & Installing $(call get_url,$(1))..." && \
+		curl -L "$(call get_url,$(1))" | tar -xz --strip-components=1 && \
+	@echo "✓ $(1) $(call get_version,$(1)) installed"
+
+.PHONY: install-$(1)
+install-$(1): $(DEPS_DIR)/$(1)/.installed
+
+.PHONY: clean-$(1)
+clean-$(1):
+	rm -rf $(DEPS_DIR)/$(1)
+endef
+
+# Generate targets for all dependencies
+$(foreach dep_name,$(DEP_NAMES),$(eval $(call DEPENDENCY_TEMPLATE,$(dep_name))))
+
+# Aggregate targets
+INSTALLED_DEPS := $(foreach dep,$(DEP_NAMES),$(DEPS_DIR)/$(dep)/.installed)
+
+depdencies: $(INSTALLED_DEPS)
+
+.PHONY: list-deps
+list-deps:
+	@echo "Project Dependencies:"
+	@echo "===================="
+	@$(foreach dep,$(DEPENDENCIES),echo "  $(dep)";)
+	@echo ""
+	@echo "Installed Dependencies:"
+	@echo "======================"
+	@$(foreach dep,$(DEP_NAMES), \
+		if [ -f "$(DEPS_DIR)/$(dep)/.installed" ]; then \
+			echo "  ✓ $(dep) $(call get_version,$(dep))"; \
+		else \
+			echo "  ✗ $(dep) $(call get_version,$(dep)) (not installed)"; \
+		fi;)
+
+
