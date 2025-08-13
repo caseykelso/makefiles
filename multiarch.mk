@@ -141,11 +141,6 @@ package-all:
 	$(MAKE) OS=macos ARCH=x86_64 package
 	$(MAKE) OS=macos ARCH=arm64 package
 
-# Clean build artifacts
-.PHONY: clean
-clean:
-	rm -rf $(BUILD_DIR) $(DIST_DIR)
-
 # Show all available targets
 .PHONY: help
 help:
