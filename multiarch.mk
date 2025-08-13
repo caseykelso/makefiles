@@ -58,8 +58,8 @@ endif
 BUILD_TIME := $(shell date +%Y%m%d_%H%M%S)
 
 # Artifact naming
-ARTIFACT_NAME := $(PROJECT_NAME)-$(VERSION)-$(OS)-$(ARCH)
-FULL_ARTIFACT_NAME := $(ARTIFACT_NAME)-$(BUILD_TIME)
+ARTIFACT.NAME := $(PROJECT_NAME)-$(VERSION)-$(OS)-$(ARCH)
+FULL_ARTIFACT.NAME := $(ARTIFACT.NAME)-$(BUILD_TIME)
 
 BINARY_EXT :=
 ARCHIVE_EXT := .tar.gz
@@ -76,36 +76,24 @@ info:
 	@echo "  Git Hash: $(GIT_HASH)"
 	@echo "  Git Branch: $(GIT_BRANCH)"
 	@echo "  Build Time: $(BUILD_TIME)"
-	@echo "  Artifact Name: $(ARTIFACT_NAME)"
+	@echo "  Artifact Name: $(ARTIFACT.NAME)"
 
+distribute: .FORCE
+	rm -rf $(DIST.DIR) && mkdir -p $(DIST.DIR)
+	cp $(MOTUS.BIN) $(DIST.DIR)/$(PACKAGE.LINUX)
 
-# Package the artifact
-.PHONY: package
-package: build $(DIST_DIR)
-	@echo "Packaging $(ARTIFACT_NAME)..."
-	# Create staging directory
-	mkdir -p $(DIST_DIR)/$(ARTIFACT_NAME)
-	
-	# Copy binary
-	cp $(BUILD_DIR)/$(PROJECT_NAME)$(BINARY_EXT) $(DIST_DIR)/$(ARTIFACT_NAME)/
-	
-	# Copy additional files
-	cp README.md $(DIST_DIR)/$(ARTIFACT_NAME)/ 2>/dev/null || true
-	cp LICENSE $(DIST_DIR)/$(ARTIFACT_NAME)/ 2>/dev/null || true
-	
-	# Create build info file
-	@echo "Project: $(PROJECT_NAME)" > $(DIST_DIR)/$(ARTIFACT_NAME)/BUILD_INFO.txt
-	@echo "Version: $(VERSION)" >> $(DIST_DIR)/$(ARTIFACT_NAME)/BUILD_INFO.txt
-	@echo "Git Hash: $(GIT_HASH)" >> $(DIST_DIR)/$(ARTIFACT_NAME)/BUILD_INFO.txt
-	@echo "Git Branch: $(GIT_BRANCH)" >> $(DIST_DIR)/$(ARTIFACT_NAME)/BUILD_INFO.txt
-	@echo "OS: $(OS)" >> $(DIST_DIR)/$(ARTIFACT_NAME)/BUILD_INFO.txt
-	@echo "Architecture: $(ARCH)" >> $(DIST_DIR)/$(ARTIFACT_NAME)/BUILD_INFO.txt
-	@echo "Build Time: $(BUILD_TIME)" >> $(DIST_DIR)/$(ARTIFACT_NAME)/BUILD_INFO.txt
-	
-	# Create archive
-	cd $(DIST_DIR) && $(ARCHIVE_CMD) $(ARTIFACT_NAME)$(ARCHIVE_EXT) $(ARTIFACT_NAME)/
-	
-	@echo "Artifact created: $(DIST_DIR)/$(ARTIFACT_NAME)$(ARCHIVE_EXT)"
+package: .FORCE
+	cd $(DIST.DIR) && tar czvf $(ARTIFACT.NAME).tar.gz && md5sum $(ARTIFACT.NAME).tar.gz > $(ARTIFACT.NAME).tar.gz.md5
+
+upload.linux: .FORCE
+ifndef S3.BUCKET
+$(error S3.BUCKET must be defined.)
+endif
+	PATH=$(HOME)/.local/bin:$(PATH) $(AWS.BIN) s3 cp $(DIST.DIR)/$(PACKAGE.LINUX.ARCHIVE) s3://$(S3.BUCKET) --acl public-read --no-progress
+	PATH=$(HOME)/.local/bin:$(PATH) $(AWS.BIN) s3 cp $(DIST.DIR)/$(PACKAGE.LINUX.ARCHIVE).md5 s3://$(S3.BUCKET) --acl public-read --no-progress
+	@echo https://$(S3.BUCKET).s3.amazonaws.com/$(PACKAGE.LINUX.ARCHIVE)
+	@echo https://$(S3.BUCKET).s3.amazonaws.com/$(PACKAGE.LINUX.ARCHIVE).md5
+
 
 # Cross-compilation targets (requires appropriate toolchains)
 .PHONY: build-linux-x86_64
