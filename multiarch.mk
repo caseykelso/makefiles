@@ -80,13 +80,12 @@ info:
 
 distribute: .FORCE
 	rm -rf $(DIST.DIR) && mkdir -p $(DIST.DIR)
-	cp -r $(INSTALLED.HOST.DIR)/bin $(DIST.DIR)
-	cp -r $(INSTALLED.HOST.DIR)/lib $(DIST.DIR)
-	cp -r $(INSTALLED.HOST.DIR)/include $(DIST.DIR)
+	cp -r $(INSTALLED.HOST.DIR)/bin $(DIST.DIR)/bin
+	cp -r $(INSTALLED.HOST.DIR)/lib $(DIST.DIR)/lib
+	cp -r $(INSTALLED.HOST.DIR)/include $(DIST.DIR)/include
 
 package: .FORCE
-	mkdir -p $(DIST.DIR)
-	cd $(DIST.DIR) && tar czvf $(ARTIFACT.NAME).tar.gz && md5sum $(ARTIFACT.NAME).tar.gz > $(ARTIFACT.NAME).tar.gz.md5
+	tar  czvf $(ARTIFACT.NAME).tar.gz -C $(DIST.DIR) .  && md5sum $(ARTIFACT.NAME).tar.gz > $(ARTIFACT.NAME).tar.gz.md5
 
 upload.linux: .FORCE
 ifndef S3.BUCKET
