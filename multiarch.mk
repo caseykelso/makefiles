@@ -83,6 +83,7 @@ distribute: .FORCE
 	cp $(MOTUS.BIN) $(DIST.DIR)/$(PACKAGE.LINUX)
 
 package: .FORCE
+	mkdir -p $(DIST.DIR)
 	cd $(DIST.DIR) && tar czvf $(ARTIFACT.NAME).tar.gz && md5sum $(ARTIFACT.NAME).tar.gz > $(ARTIFACT.NAME).tar.gz.md5
 
 upload.linux: .FORCE
