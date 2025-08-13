@@ -1,6 +1,23 @@
 # Makefile for building and publishing cross-platform artifacts
 # Supports Linux, macOS, Windows with proper architecture detection
 
+# Check required variables from calling makefile
+ifndef INSTALLED.HOST.DIR
+$(error INSTALLED.HOST.DIR must be defined by the calling Makefile)
+endif
+
+ifndef DOWNLOADS.DIR
+$(error DOWNLOADS.DIR must be defined by the calling Makefile)
+endif
+
+ifndef PACKAGE.DIR
+$(error PACKAGE.DIR must be defined by the calling Makefile)
+endif
+
+ifndef DEPENDENCIES
+$(error DEPENDENCIES must be defined by the calling Makefile)
+endif
+
 # Detect operating system
 UNAME_S := $(shell uname -s)
 ifeq ($(UNAME_S),Linux)
