@@ -65,6 +65,8 @@ BINARY_EXT :=
 ARCHIVE_EXT := .tar.gz
 ARCHIVE_CMD := tar -czf
 
+AWS.BIN=aws
+
 # Display build information
 .PHONY: info
 info:
