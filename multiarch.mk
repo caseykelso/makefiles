@@ -162,7 +162,7 @@ define get_url
 https://$(S3.BUCKET).s3.amazonaws.com/$(1)-$(call get_version,$(1))-$(OS)-$(ARCH).tar.gz
 endef
 
-
+DEP_NAMES := $(foreach dep,$(DEPENDENCIES),$(word 1,$(subst :, ,$(dep))))
 
 # Force install approach - no .installed file checking
 FORCE_INSTALL_DEPS := $(foreach dep,$(DEP_NAMES),force-install-$(dep))
