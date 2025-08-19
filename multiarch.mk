@@ -74,8 +74,14 @@ endif
 # Build timestamp
 BUILD_TIME := $(shell date +%Y%m%d_%H%M%S)
 
+# Package version (should be provided by calling Makefile)
+ifndef PACKAGE_VERSION
+$(warning PACKAGE_VERSION not defined, using VERSION as fallback)
+PACKAGE_VERSION := $(VERSION)
+endif
+
 # Artifact naming
-ARTIFACT.NAME := $(PROJECT_NAME)-$(VERSION)-$(OS)-$(ARCH)
+ARTIFACT.NAME := $(PROJECT_NAME)-$(VERSION)-$(PACKAGE_VERSION)-$(OS)-$(ARCH)
 FULL_ARTIFACT.NAME := $(ARTIFACT.NAME)-$(BUILD_TIME)
 
 BINARY_EXT :=
@@ -92,6 +98,7 @@ info:
 	@echo "  OS: $(OS)"
 	@echo "  Architecture: $(ARCH)"
 	@echo "  Version: $(VERSION) ($(VERSION_TYPE))"
+	@echo "  Package Version: $(PACKAGE_VERSION)"
 	@echo "  Git Hash: $(GIT_HASH)"
 	@echo "  Git Branch: $(GIT_BRANCH)"
 	@echo "  Build Time: $(BUILD_TIME)"
