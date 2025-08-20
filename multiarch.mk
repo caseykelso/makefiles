@@ -77,7 +77,7 @@ BUILD_TIME := $(shell date +%Y%m%d_%H%M%S)
 # Package version (should be provided by calling Makefile)
 ifndef PACKAGE_VERSION
 $(warning PACKAGE_VERSION not defined, using VERSION as fallback)
-PACKAGE_VERSION := $(VERSION)
+PACKAGE_VERSION := .
 endif
 
 # Artifact naming
