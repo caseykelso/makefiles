@@ -76,12 +76,13 @@ BUILD_TIME := $(shell date +%Y%m%d_%H%M%S)
 
 # Package version (should be provided by calling Makefile)
 ifndef PACKAGE_VERSION
-$(warning PACKAGE_VERSION not defined, using VERSION as fallback)
-PACKAGE_VERSION := .
+ARTIFACT.NAME := $(PROJECT_NAME)-$(VERSION)-$(OS)-$(ARCH)
+else
+ARTIFACT.NAME := $(PROJECT_NAME)-$(VERSION)-$(PACKAGE_VERSION)-$(OS)-$(ARCH)
 endif
 
 # Artifact naming
-ARTIFACT.NAME := $(PROJECT_NAME)-$(VERSION)-$(PACKAGE_VERSION)-$(OS)-$(ARCH)
+#
 FULL_ARTIFACT.NAME := $(ARTIFACT.NAME)-$(BUILD_TIME)
 
 BINARY_EXT :=
